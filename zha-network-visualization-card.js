@@ -65,7 +65,8 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       data.nodes.push({
         id: device["ieee"],
         label: this._buildLabel(device),
-        shape: this._getShape(device)
+        shape: this._getShape(device),
+	mass: this._getMass(device),
       });
       if (device.neighbours && device.neighbours.length > 0) {
         device.neighbours.map(neighbour => {
@@ -89,6 +90,16 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       return {"color": "yellow", "highlight": "yellow"}
     }
     return {"color": "red", "highlight": "red"}
+  }
+
+  _getMass(device) {
+    if (device.device_type === "Coordinator") {
+      return 2;
+    } else if (device.device_type === "Router") {
+      return 4;
+    } else {
+      return 5;
+    }
   }
 
   _getShape(device) {
