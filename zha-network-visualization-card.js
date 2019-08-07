@@ -13,10 +13,10 @@ loadCSS("https://unpkg.com/vis-network@5.2.0/dist/vis-network.min.css");
 class ZHANetworkVisualizationCard extends HTMLElement {
   constructor() {
     super();
+    this.bufferTime = 1000 * 60 * 5; //5 minutes
     this.attachShadow({
       mode: "open"
     });
-    this.card_height = 50;
     this.networkOptions = {
       autoResize: true,
       height: "1000px",
@@ -43,17 +43,15 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     const root = this.shadowRoot;
     if (root.lastChild) root.removeChild(root.lastChild);
 
-    const cfg = Object.assign({}, config);
+    this._config = Object.assign({}, config);
 
     // assemble html
     const card = document.createElement("ha-card");
-    card.header = cfg.title;
     const content = document.createElement("div");
 
     card.appendChild(content);
-    // append card to _root_ node...
     root.appendChild(card);
-    this._config = cfg;
+
     this.network = new vis.Network(content, {}, this.networkOptions);
   }
 
@@ -109,9 +107,12 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   set hass(hass) {
-    const config = this._config;
-    const root = this.shadowRoot;
-
+    if (
+      this.lastUpdated &&
+      new Date(this.lastUpdated + this.bufferTime) > Date.now()
+    ) {
+      return;
+    }
     hass
       .callWS({
         type: "zha_map/devices"
@@ -119,14 +120,11 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       .then(devices => {
         this._updateContent(devices);
       });
-  }
-
-  _setCardSize(num_rows) {
-    this.card_height = parseInt(num_rows * 0.5);
+    this.lastUpdated = Date.now();
   }
 
   getCardSize() {
-    return 40;
+    return 10;
   }
 }
 
