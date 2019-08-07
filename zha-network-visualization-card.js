@@ -92,18 +92,20 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _buildLabel(device) {
-    return (
-      "<b>Manufacturer:</b> " +
-      device.manufacturer +
-      "\n <b>Model:</b> " +
-      device.model +
-      "\n <b>IEEE:</b> " +
-      device.ieee +
-      " \n <b>NWK:</b> " +
-      device.nwk +
-      "\n <b>Device Type:</b>" +
-      device.device_type.replace("_", " ")
-    );
+    var res = "<b>IEEE: </b>" + device.ieee
+    res += "\n<b>Device Type: </b>" +  device.device_type.replace("_", " ")
+    if (device.nwk != null) {
+      res += "\n<b>NWK: </b>" + device.nwk
+    }
+    if (device.manufacturer != null && device.model != null) {
+      res += "\n<b>Device: </b>" + device.manufacturer + " " + device.model
+    } else {
+      res += "\n<b>Device is not in <i>'zigbee.db'</i></b>"
+    }
+    if (device.offline) {
+      res += "\n<b>Device is <i>Offline</i></b>"
+    }
+    return res;
   }
 
   set hass(hass) {
