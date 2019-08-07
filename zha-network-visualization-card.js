@@ -72,13 +72,23 @@ class ZHANetworkVisualizationCard extends HTMLElement {
           data.edges.push({
             from: device["ieee"],
             to: neighbour["ieee"],
-            label: neighbour["lqi"] + ""
+            label: neighbour["lqi"] + "",
+	    color: this._getLQI(neighbour["lqi"])
           });
         });
       }
     });
 
     this.network.setData(data);
+  }
+
+  _getLQI(lqi) {
+    if (lqi > 192) {
+      return {"color": "green", "highlight": "green"}
+    } else if (lqi > 128) {
+      return {"color": "yellow", "highlight": "yellow"}
+    }
+    return {"color": "red", "highlight": "red"}
   }
 
   _getShape(device) {
