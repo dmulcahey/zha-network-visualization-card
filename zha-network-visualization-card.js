@@ -56,31 +56,34 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _updateContent(devices) {
-    var data = {
-      nodes: [],
-      edges: []
-    };
+    var nodes = [], edges = []
 
     devices.map(device => {
-      data.nodes.push({
+      nodes.push({
         id: device["ieee"],
         label: this._buildLabel(device),
         shape: this._getShape(device),
-	mass: this._getMass(device),
+        mass: this._getMass(device),
       });
       if (device.neighbours && device.neighbours.length > 0) {
         device.neighbours.map(neighbour => {
-          data.edges.push({
-            from: device["ieee"],
-            to: neighbour["ieee"],
-            label: neighbour["lqi"] + "",
-	    color: this._getLQI(neighbour["lqi"])
-          });
+          var idx = edges.findIndex(function(e) {return device.ieee === e.to && neighbour.ieee === e.from});
+          if (idx === -1) {
+            edges.push({
+              from: device["ieee"],
+              to: neighbour["ieee"],
+              label: neighbour["lqi"] + "",
+              color: this._getLQI(neighbour["lqi"])
+            })
+          } else {
+            edges[idx].color = this._getLQI((parseInt(edges[idx].label) + neighbour.lqi)/2)
+            edges[idx].label += "/" + neighbour["lqi"]
+          }
         });
-      }
+      };
     });
 
-    this.network.setData(data);
+    this.network.setData({"nodes": nodes, "edges": edges});
   }
 
   _getLQI(lqi) {
