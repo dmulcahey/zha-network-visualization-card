@@ -53,46 +53,64 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     root.appendChild(card);
 
     this.network = new vis.Network(content, {}, this.networkOptions);
+
+    this.network.on("click", function(properties) {
+      const ieee = properties.nodes[0];
+      if (ieee) {
+        let ev = new Event("zha-show-device-dialog", {
+          bubbles: true,
+          cancelable: false,
+          composed: true
+        });
+        ev.detail = { ieee: ieee };
+        root.dispatchEvent(ev);
+      }
+    });
   }
 
   _updateContent(devices) {
-    var nodes = [], edges = []
+    var nodes = [],
+      edges = [];
 
     devices.map(device => {
       nodes.push({
         id: device["ieee"],
         label: this._buildLabel(device),
         shape: this._getShape(device),
-        mass: this._getMass(device),
+        mass: this._getMass(device)
       });
       if (device.neighbours && device.neighbours.length > 0) {
         device.neighbours.map(neighbour => {
-          var idx = edges.findIndex(function(e) {return device.ieee === e.to && neighbour.ieee === e.from});
+          var idx = edges.findIndex(function(e) {
+            return device.ieee === e.to && neighbour.ieee === e.from;
+          });
           if (idx === -1) {
             edges.push({
               from: device["ieee"],
               to: neighbour["ieee"],
               label: neighbour["lqi"] + "",
               color: this._getLQI(neighbour["lqi"])
-            })
+            });
           } else {
-            edges[idx].color = this._getLQI((parseInt(edges[idx].label) + neighbour.lqi)/2)
-            edges[idx].label += "/" + neighbour["lqi"]
+            edges[idx].color = this._getLQI(
+              (parseInt(edges[idx].label) + neighbour.lqi) / 2
+            );
+            edges[idx].label += "/" + neighbour["lqi"];
           }
         });
-      };
+      }
     });
 
-    this.network.setData({"nodes": nodes, "edges": edges});
+    this.network.setData({ nodes: nodes, edges: edges });
   }
 
   _getLQI(lqi) {
     if (lqi > 192) {
-      return {"color": "green", "highlight": "green"}
+      return { color: "green", highlight: "green" };
     } else if (lqi > 128) {
-      return {"color": "yellow", "highlight": "yellow"}
+      return { color: "yellow", highlight: "yellow" };
     }
-    return {"color": "red", "highlight": "red"}
+    return { color: "red", highlight: "red" };
   }
 
   _getMass(device) {
@@ -116,18 +134,18 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _buildLabel(device) {
-    var res = "<b>IEEE: </b>" + device.ieee
-    res += "\n<b>Device Type: </b>" +  device.device_type.replace("_", " ")
+    var res = "<b>IEEE: </b>" + device.ieee;
+    res += "\n<b>Device Type: </b>" + device.device_type.replace("_", " ");
     if (device.nwk != null) {
-      res += "\n<b>NWK: </b>" + device.nwk
+      res += "\n<b>NWK: </b>" + device.nwk;
     }
     if (device.manufacturer != null && device.model != null) {
-      res += "\n<b>Device: </b>" + device.manufacturer + " " + device.model
+      res += "\n<b>Device: </b>" + device.manufacturer + " " + device.model;
     } else {
-      res += "\n<b>Device is not in <i>'zigbee.db'</i></b>"
+      res += "\n<b>Device is not in <i>'zigbee.db'</i></b>";
     }
     if (device.offline) {
-      res += "\n<b>Device is <i>Offline</i></b>"
+      res += "\n<b>Device is <i>Offline</i></b>";
     }
     return res;
   }
