@@ -48,13 +48,15 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     // assemble html
     const card = document.createElement("ha-card");
     const content = document.createElement("div");
+    this.timelabel = document.createElement('label');
 
+    card.appendChild(this.timelabel);
     card.appendChild(content);
     root.appendChild(card);
 
     this.network = new vis.Network(content, {}, this.networkOptions);
 
-    this.network.on("click", function(properties) {
+    this.network.on("click", function (properties) {
       const ieee = properties.nodes[0];
       if (ieee) {
         let ev = new Event("zha-show-device-dialog", {
@@ -68,7 +70,18 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     });
   }
 
-  _updateContent(devices) {
+  _updateContent(data) {
+    this._updateDevices(data.devices);
+    this._updateTimestamp(data.time);
+  }
+
+  _updateTimestamp(timestamp) {
+    var date = new Date(timestamp * 1000);
+    var iso = date.toISOString().match(/(\d{4}\-\d{2}\-\d{2})T(\d{2}:\d{2}:\d{2})/)
+    this.timelabel.innerHTML = iso[1] + ' ' + iso[2];
+  }
+
+  _updateDevices(devices) {
     var nodes = [],
       edges = [];
 
@@ -161,8 +174,8 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       .callWS({
         type: "zha_map/devices"
       })
-      .then(devices => {
-        this._updateContent(devices);
+      .then(data => {
+        this._updateContent(data);
       });
     this.lastUpdated = Date.now();
   }
