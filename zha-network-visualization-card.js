@@ -56,7 +56,7 @@ class ZHANetworkVisualizationCard extends HTMLElement {
 
     this.network = new vis.Network(content, {}, this.networkOptions);
 
-    this.network.on("click", function (properties) {
+    this.network.on("click", function(properties) {
       const ieee = properties.nodes[0];
       if (ieee) {
         let ev = new Event("zha-show-device-dialog", {
@@ -147,7 +147,13 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _buildLabel(device) {
-    var res = "<b>IEEE: </b>" + device.ieee;
+    var regDevices = this.deviceRegistry.filter(regDev => {
+      return regDev.ieee === device.ieee
+    });
+
+    var res = regDevices.length > 0 ?
+      "<b>" + regDevices[0].user_given_name + "</b>" + "\n" : "";
+    res += "<b>IEEE: </b>" + device.ieee;
     res += "\n<b>Device Type: </b>" + device.device_type.replace("_", " ");
     if (device.nwk != null) {
       res += "\n<b>NWK: </b>" + device.nwk;
@@ -172,11 +178,20 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     }
     hass
       .callWS({
-        type: "zha_map/devices"
+        type: "zha/devices"
       })
-      .then(data => {
-        this._updateContent(data);
+      .then(devices => {
+        this.deviceRegistry = devices;
+
+        hass
+          .callWS({
+            type: "zha_map/devices"
+          })
+          .then(zhaMapData => {
+            this._updateContent(zhaMapData);
+          });
       });
+
     this.lastUpdated = Date.now();
   }
 
