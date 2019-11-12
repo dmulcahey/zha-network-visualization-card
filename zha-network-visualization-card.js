@@ -49,11 +49,14 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     const card = document.createElement("ha-card");
     const content = document.createElement("div");
     this.timelabel = document.createElement('label');
+    this.filterinput = document.createElement('input');
 
     card.appendChild(this.timelabel);
+    card.appendChild(this.filterinput);
     card.appendChild(content);
     root.appendChild(card);
 
+    this.nodes = []
     this.network = new vis.Network(content, {}, this.networkOptions);
 
     this.network.on("click", function(properties) {
@@ -68,6 +71,13 @@ class ZHANetworkVisualizationCard extends HTMLElement {
         root.dispatchEvent(ev);
       }
     });
+
+    self = this;
+    this.filterinput.oninput = function() {
+      let filterednodes = self.nodes.filter(
+        x => x.label.toLowerCase().includes(self.filterinput.value.toLowerCase()));
+      self.network.selectNodes(filterednodes.map(x => x.id));
+    };
   }
 
   _updateContent(data) {
@@ -82,11 +92,11 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _updateDevices(devices) {
-    var nodes = [],
-      edges = [];
+    this.nodes = [];
+    var edges = [];
 
     devices.map(device => {
-      nodes.push({
+      this.nodes.push({
         id: device["ieee"],
         label: this._buildLabel(device),
         shape: this._getShape(device),
@@ -114,7 +124,7 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       }
     });
 
-    this.network.setData({ nodes: nodes, edges: edges });
+    this.network.setData({ nodes: this.nodes, edges: edges });
   }
 
   _getLQI(lqi) {
