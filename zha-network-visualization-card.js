@@ -34,6 +34,13 @@ class ZHANetworkVisualizationCard extends HTMLElement {
         font: {
           multi: "html"
         }
+      },
+      edges: {
+        smooth: {
+          type: "continuous",
+          forceDirection: "none",
+          roundness: 0.6
+        }
       }
     };
   }
