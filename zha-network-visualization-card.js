@@ -21,26 +21,14 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       autoResize: true,
       height: "1000px",
       layout: {
-        improvedLayout: false, 
-	hierarchical: {
-	  enabled:true,
-	  nodeSpacing: 500
-	} 
+        improvedLayout: true
       },
       physics: {
-        forceAtlas2Based: {
+        barnesHut: {
           springConstant: 0,
-          avoidOverlap: 1,
+          avoidOverlap: 10,
           damping: 0.09
-        },
-    hierarchicalRepulsion: {
-      centralGravity: 0.0,
-      springLength: 100,
-      springConstant: 0.01,
-      nodeDistance: 400,
-      damping: 0.09,
-      avoidOverlap: 1 
-    }
+        }
       },
       nodes: {
         font: {
