@@ -141,11 +141,13 @@ class ZHANetworkVisualizationCard extends HTMLElement {
 
   _getLQI(lqi) {
     if (lqi > 192) {
-      return { color: "green", highlight: "green" };
+      return { color: "#17ab00", highlight: "#17ab00" };
     } else if (lqi > 128) {
-      return { color: "yellow", highlight: "yellow" };
+      return { color: "#e6b402", highlight: "#e6b402" };
+    } else if (lqi > 80) {
+      return { color: "#fc4c4c", highlight: "#fc4c4c" };
     }
-    return { color: "red", highlight: "red" };
+    return { color: "#bfbfbf", highlight: "#bfbfbf" };
   }
 
   _getMass(device) {
