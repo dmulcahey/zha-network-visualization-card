@@ -61,7 +61,6 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     card.appendChild(this.timelabel);
     card.appendChild(this.filterinput);
     card.appendChild(content);
-    root.appendChild(card);
 
     this.nodes = [];
     this.network = new vis.Network(content, {}, this.networkOptions);
