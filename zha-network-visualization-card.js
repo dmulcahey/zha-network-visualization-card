@@ -79,12 +79,11 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       }
     });
 
-    self = this;
     this.filterinput.oninput = function() {
-      let filterednodes = self.nodes.filter(
-        x => x.label.toLowerCase().includes(self.filterinput.value.toLowerCase()));
-      self.network.selectNodes(filterednodes.map(x => x.id));
-    };
+      let filterednodes = this.nodes.filter(
+        x => x.label.toLowerCase().includes(this.filterinput.value.toLowerCase()));
+      this.network.selectNodes(filterednodes.map(x => x.id));
+    }.bind(this);
   }
 
   _updateContent(data) {
