@@ -1,4 +1,4 @@
-import "https://unpkg.com/vis-network@5.2.0/dist/vis-network.min.js?module";
+import "https://unpkg.com/vis-network@8.1.0/dist/vis-network.min.js?module";
 
 function loadCSS(url) {
   const link = document.createElement("link");
@@ -8,40 +8,40 @@ function loadCSS(url) {
   document.head.appendChild(link);
 }
 
-loadCSS("https://unpkg.com/vis-network@5.2.0/dist/vis-network.min.css");
+loadCSS("https://unpkg.com/vis-network@8.1.0/dist/dist/vis-network.min.css");
 
 class ZHANetworkVisualizationCard extends HTMLElement {
   constructor() {
     super();
     this.bufferTime = 1000 * 60 * 5; //5 minutes
     this.attachShadow({
-      mode: "open"
+      mode: "open",
     });
     this.networkOptions = {
       autoResize: true,
       height: "1000px",
       layout: {
-        improvedLayout: true
+        improvedLayout: true,
       },
       physics: {
         barnesHut: {
           springConstant: 0,
           avoidOverlap: 10,
-          damping: 0.09
-        }
+          damping: 0.09,
+        },
       },
       nodes: {
         font: {
-          multi: "html"
-        }
+          multi: "html",
+        },
       },
       edges: {
         smooth: {
           type: "continuous",
           forceDirection: "none",
-          roundness: 0.6
-        }
-      }
+          roundness: 0.6,
+        },
+      },
     };
   }
 
@@ -55,35 +55,38 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     // assemble html
     const card = document.createElement("ha-card");
     const content = document.createElement("div");
-    this.timelabel = document.createElement('label');
-    this.filterinput = document.createElement('input');
+    this.timelabel = document.createElement("label");
+    this.filterinput = document.createElement("input");
 
     card.appendChild(this.timelabel);
     card.appendChild(this.filterinput);
     card.appendChild(content);
     root.appendChild(card);
 
-    this.nodes = []
+    this.nodes = [];
     this.network = new vis.Network(content, {}, this.networkOptions);
 
-    this.network.on("click", function(properties) {
+    this.network.on("click", function (properties) {
       const ieee = properties.nodes[0];
       if (ieee) {
         let ev = new Event("zha-show-device-dialog", {
           bubbles: true,
           cancelable: false,
-          composed: true
+          composed: true,
         });
         ev.detail = { ieee: ieee };
         root.dispatchEvent(ev);
       }
     });
 
-    this.filterinput.oninput = function() {
-      let filterednodes = this.nodes.filter(
-        x => x.label.toLowerCase().includes(this.filterinput.value.toLowerCase()));
-      this.network.selectNodes(filterednodes.map(x => x.id));
+    this.filterinput.oninput = function () {
+      let filterednodes = this.nodes.filter((x) =>
+        x.label.toLowerCase().includes(this.filterinput.value.toLowerCase())
+      );
+      this.network.selectNodes(filterednodes.map((x) => x.id));
     }.bind(this);
+
+    root.appendChild(card);
   }
 
   _updateContent(data) {
@@ -93,24 +96,26 @@ class ZHANetworkVisualizationCard extends HTMLElement {
 
   _updateTimestamp(timestamp) {
     var date = new Date(timestamp * 1000);
-    var iso = date.toISOString().match(/(\d{4}\-\d{2}\-\d{2})T(\d{2}:\d{2}:\d{2})/)
-    this.timelabel.innerHTML = iso[1] + ' ' + iso[2];
+    var iso = date
+      .toISOString()
+      .match(/(\d{4}\-\d{2}\-\d{2})T(\d{2}:\d{2}:\d{2})/);
+    this.timelabel.innerHTML = iso[1] + " " + iso[2];
   }
 
   _updateDevices(devices) {
     this.nodes = [];
     var edges = [];
 
-    devices.map(device => {
+    devices.map((device) => {
       this.nodes.push({
         id: device["ieee"],
         label: this._buildLabel(device),
         shape: this._getShape(device),
-        mass: this._getMass(device)
+        mass: this._getMass(device),
       });
       if (device.neighbours && device.neighbours.length > 0) {
-        device.neighbours.map(neighbour => {
-          var idx = edges.findIndex(function(e) {
+        device.neighbours.map((neighbour) => {
+          var idx = edges.findIndex(function (e) {
             return device.ieee === e.to && neighbour.ieee === e.from;
           });
           if (idx === -1) {
@@ -118,7 +123,7 @@ class ZHANetworkVisualizationCard extends HTMLElement {
               from: device["ieee"],
               to: neighbour["ieee"],
               label: neighbour["lqi"] + "",
-              color: this._getLQI(neighbour["lqi"])
+              color: this._getLQI(neighbour["lqi"]),
             });
           } else {
             edges[idx].color = this._getLQI(
@@ -165,12 +170,14 @@ class ZHANetworkVisualizationCard extends HTMLElement {
   }
 
   _buildLabel(device) {
-    var regDevices = this.deviceRegistry.filter(regDev => {
-      return regDev.ieee === device.ieee
+    var regDevices = this.deviceRegistry.filter((regDev) => {
+      return regDev.ieee === device.ieee;
     });
 
-    var res = regDevices.length > 0 ?
-      "<b>" + regDevices[0].user_given_name + "</b>" + "\n" : "";
+    var res =
+      regDevices.length > 0
+        ? "<b>" + regDevices[0].user_given_name + "</b>" + "\n"
+        : "";
     res += "<b>IEEE: </b>" + device.ieee;
     res += "\n<b>Device Type: </b>" + device.device_type.replace("_", " ");
     if (device.nwk != null) {
@@ -196,16 +203,16 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     }
     hass
       .callWS({
-        type: "zha/devices"
+        type: "zha/devices",
       })
-      .then(devices => {
+      .then((devices) => {
         this.deviceRegistry = devices;
 
         hass
           .callWS({
-            type: "zha_map/devices"
+            type: "zha_map/devices",
           })
-          .then(zhaMapData => {
+          .then((zhaMapData) => {
             this._updateContent(zhaMapData);
           });
       });
