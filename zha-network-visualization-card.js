@@ -174,7 +174,7 @@ class ZHANetworkVisualizationCard extends HTMLElement {
     });
 
     var res =
-      regDevices.length > 0
+      regDevices.length > 0 && regDevices[0].user_given_name !== null
         ? "<b>" + regDevices[0].user_given_name + "</b>" + "\n"
         : "";
     res += "<b>IEEE: </b>" + device.ieee;
