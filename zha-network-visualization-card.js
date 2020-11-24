@@ -118,23 +118,23 @@ class ZHANetworkVisualizationCard extends HTMLElement {
         shape: this._getShape(device),
         mass: this._getMass(device),
       });
-      if (device.neighbours && device.neighbours.length > 0) {
-        device.neighbours.map((neighbour) => {
+      if (device.neighbors && device.neighbors.length > 0) {
+        device.neighbors.map((neighbor) => {
           var idx = edges.findIndex(function (e) {
-            return device.ieee === e.to && neighbour.ieee === e.from;
+            return device.ieee === e.to && neighbor.ieee === e.from;
           });
           if (idx === -1) {
             edges.push({
               from: device["ieee"],
-              to: neighbour["ieee"],
-              label: neighbour["lqi"] + "",
-              color: this._getLQI(neighbour["lqi"]),
+              to: neighbor["ieee"],
+              label: neighbor["lqi"] + "",
+              color: this._getLQI(neighbor["lqi"]),
             });
           } else {
             edges[idx].color = this._getLQI(
-              (parseInt(edges[idx].label) + neighbour.lqi) / 2
+              (parseInt(edges[idx].label) + neighbor.lqi) / 2
             );
-            edges[idx].label += "/" + neighbour["lqi"];
+            edges[idx].label += "/" + neighbor["lqi"];
           }
         });
       }
