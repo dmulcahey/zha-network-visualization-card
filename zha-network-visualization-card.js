@@ -64,17 +64,23 @@ class ZHANetworkVisualizationCard extends HTMLElement {
 
     this.nodes = [];
     this.network = new vis.Network(content, {}, this.networkOptions);
-
+    var me = this;
     this.network.on("click", function (properties) {
       const ieee = properties.nodes[0];
       if (ieee) {
-        let ev = new Event("zha-show-device-dialog", {
-          bubbles: true,
-          cancelable: false,
-          composed: true,
+        var devices = me.deviceRegistry.filter((regDev) => {
+          return regDev.ieee === ieee;
         });
-        ev.detail = { ieee: ieee };
-        root.dispatchEvent(ev);
+        if(devices[0]){
+          let ev = new Event("location-changed", {
+            bubbles: true,
+            cancelable: false,
+            composed: true,
+          });
+          ev.detail = { replace: false };
+          history.pushState(null, "", '/config/devices/device/' + devices[0].device_reg_id);
+          root.dispatchEvent(ev);
+        }
       }
     });
 
