@@ -206,17 +206,9 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       })
       .then((devices) => {
         this.deviceRegistry = devices;
-
-        hass
-          .callWS({
-            type: "zha_map/devices",
-          })
-          .then((zhaMapData) => {
-            this._updateContent(zhaMapData);
-          });
+        this.lastUpdated = Date.now();
+        this._updateContent({"devices": devices, "time": this.lastUpdated});
       });
-
-    this.lastUpdated = Date.now();
   }
 
   getCardSize() {
