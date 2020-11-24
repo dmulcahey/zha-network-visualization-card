@@ -1,4 +1,4 @@
-import "https://unpkg.com/vis-network@8.1.0/dist/vis-network.min.js?module";
+import "https://unpkg.com/vis-network@8.5.4/dist/vis-network.min.js?module";
 
 function loadCSS(url) {
   const link = document.createElement("link");
@@ -8,7 +8,7 @@ function loadCSS(url) {
   document.head.appendChild(link);
 }
 
-loadCSS("https://unpkg.com/vis-network@8.1.0/dist/dist/vis-network.min.css");
+loadCSS("https://unpkg.com/vis-network@8.5.4/dist/dist/vis-network.min.css");
 
 class ZHANetworkVisualizationCard extends HTMLElement {
   constructor() {
