@@ -71,14 +71,18 @@ class ZHANetworkVisualizationCard extends HTMLElement {
         var devices = me.deviceRegistry.filter((regDev) => {
           return regDev.ieee === ieee;
         });
-        if(devices[0]){
+        if (devices[0]) {
           let ev = new Event("location-changed", {
             bubbles: true,
             cancelable: false,
             composed: true,
           });
           ev.detail = { replace: false };
-          history.pushState(null, "", '/config/devices/device/' + devices[0].device_reg_id);
+          history.pushState(
+            null,
+            "",
+            "/config/devices/device/" + devices[0].device_reg_id
+          );
           root.dispatchEvent(ev);
         }
       }
@@ -213,7 +217,7 @@ class ZHANetworkVisualizationCard extends HTMLElement {
       .then((devices) => {
         this.deviceRegistry = devices;
         this.lastUpdated = Date.now();
-        this._updateContent({"devices": devices, "time": this.lastUpdated});
+        this._updateContent({ devices: devices, time: this.lastUpdated });
       });
   }
 
