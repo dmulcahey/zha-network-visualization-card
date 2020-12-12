@@ -1,3 +1,7 @@
+## DEPRECATED THIS IS NOW BUILT INTO HOME ASSISTANT!!!
+
+There will be no further updates to this card. If you have it installed make sure to remove it and the zha_map custom component when updating to HA 1.0.0
+
 # zha-network-visualization-card
 
 Lovelace custom element for visualizing the ZHA Zigbee network
